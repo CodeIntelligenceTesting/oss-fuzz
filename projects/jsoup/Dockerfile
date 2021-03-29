@@ -18,7 +18,7 @@ FROM gcr.io/oss-fuzz-base/base-builder
 RUN apt-get update && apt-get install -y maven
 
 RUN git clone --depth 1 https://github.com/google/fuzzing
-RUN cat fuzzing/dictionaries/html.dict > $OUT/JsoupFuzzer.dict
+RUN cat fuzzing/dictionaries/html.dict > $SRC/JsoupFuzzer.dict
 
 ENV JSOUP_BRANCH=1.13.1
 
