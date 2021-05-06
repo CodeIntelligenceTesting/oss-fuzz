@@ -15,18 +15,16 @@
 #
 ################################################################################
 
-MAVEN_ARGS="-P!java14+ -Dmaven.test.skip=true -Djavac.src.version=15 -Djavac.target.version=15"
+# Move seed corpus and dictionary.
+mv $SRC/{*.zip,*.dict} $OUT
 
-DEPENDENCIES="jsoup"
-for dependency in $DEPENDENCIES; do
-  cd $SRC/$dependency
-  mvn package $MAVEN_ARGS
-  current_version=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate \
-  -Dexpression=project.version -q -DforceStdout)
-  cp "target/$dependency-$current_version.jar" $OUT/$dependency.jar
-done
+MAVEN_ARGS="-Dmaven.test.skip=true -Djavac.src.version=15 -Djavac.target.version=15"
+$MVN package org.apache.maven.plugins:maven-shade-plugin:3.2.4:shade $MAVEN_ARGS
+CURRENT_VERSION=$($MVN org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate \
+ -Dexpression=project.version -q -DforceStdout)
+cp "target/jsoup-$CURRENT_VERSION.jar" $OUT/jsoup.jar
 
-ALL_JARS=$(echo $DEPENDENCIES | xargs printf -- "%s.jar ")
+ALL_JARS="jsoup.jar"
 
 # The classpath at build-time includes the project jars in $OUT as well as the
 # Jazzer API.

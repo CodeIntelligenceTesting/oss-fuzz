@@ -15,12 +15,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 import com.code_intelligence.jazzer.api.FuzzedDataProvider;
+
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.jsoup.parser.Parser;
 
-
-public class JsoupFuzzer {
-	public static void fuzzerTestOneInput(FuzzedDataProvider data) {
-		Document doc = Jsoup.parse(data.consumeRemainingAsString());
-	}
+public class XmlFuzzer {
+  public static void fuzzerTestOneInput(FuzzedDataProvider data) {
+    Jsoup.parse(data.consumeRemainingAsString(), "", Parser.xmlParser());
+  }
 }

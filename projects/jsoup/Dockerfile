@@ -15,17 +15,24 @@
 ################################################################################
 
 FROM gcr.io/oss-fuzz-base/base-builder
-RUN apt-get update && apt-get install -y maven
 
-RUN git clone --depth 1 https://github.com/google/fuzzing
-RUN cat fuzzing/dictionaries/html.dict > $SRC/JsoupFuzzer.dict
-RUN cat fuzzing/dictionaries/xml.dict > $SRC/JsoupXMLFuzzer.dict
+RUN curl -L https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.zip -o maven.zip && \
+    unzip maven.zip -d $SRC/maven && \
+    rm -rf maven.zip
 
-ENV JSOUP_BRANCH=1.13.1
+ENV MVN $SRC/maven/apache-maven-3.6.3/bin/mvn
+
+RUN git clone --depth 1 https://github.com/google/fuzzing && \
+    mv fuzzing/dictionaries/html.dict $SRC/HtmlFuzzer.dict && \
+    mv fuzzing/dictionaries/xml.dict $SRC/XmlFuzzer.dict && \
+    rm -rf fuzzing
+
+RUN git clone --depth 1 https://github.com/dvyukov/go-fuzz-corpus && \
+    zip -j $SRC/XmlFuzzer_seed_corpus.zip go-fuzz-corpus/xml/corpus/* && \
+    rm -rf go-fuzz-corpus
 
 RUN git clone --depth 1 https://github.com/jhy/jsoup/
 
 COPY build.sh $SRC/
-COPY JsoupFuzzer.java JsoupXMLFuzzer.java $SRC/
-WORKDIR $SRC/
-
+COPY HtmlFuzzer.java XmlFuzzer.java $SRC/
+WORKDIR $SRC/jsoup
