@@ -15,13 +15,12 @@
 #
 ################################################################################
 
-mv $SRC/{*.zip,*.dict} $OUT
-
 cp -r "/usr/lib/jvm/java-17-openjdk-amd64/" "$JAVA_HOME"
 
-wget -O "$OUT/tomcat-coyote.jar" "https://repo1.maven.org/maven2/org/apache/tomcat/tomcat-coyote/10.1.0-M15/tomcat-coyote-10.1.0-M15.jar"
-wget -O "$OUT/tomcat-util.jar" "https://repo1.maven.org/maven2/org/apache/tomcat/tomcat-util/10.1.0-M15/tomcat-util-10.1.0-M15.jar"
-# wget -O "$OUT/tomcat-juli.jar" "https://repo1.maven.org/maven2/org/apache/tomcat/juli/6.0.53/juli-6.0.53.jar"
+$ANT
+
+cp "output/build/lib/tomcat-coyote.jar" "$OUT/tomcat-coyote.jar"
+cp "output/build/lib/tomcat-util.jar" "$OUT/tomcat-util.jar"
 
 ALL_JARS="tomcat-coyote.jar tomcat-util.jar"
 
@@ -41,6 +40,7 @@ for fuzzer in $(find $SRC -name '*Fuzzer.java'); do
   echo "#!/bin/sh
 # LLVMFuzzerTestOneInput for fuzzer detection.
 this_dir=\$(dirname \"\$0\")
+JAVA_HOME=\"\$this_dir/open-jdk-17/\" \
 LD_LIBRARY_PATH=\"$JVM_LD_LIBRARY_PATH\":\$this_dir \
 \$this_dir/jazzer_driver --agent_path=\$this_dir/jazzer_agent_deploy.jar \
 --cp=$RUNTIME_CLASSPATH \

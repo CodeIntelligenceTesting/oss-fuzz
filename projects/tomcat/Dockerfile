@@ -16,13 +16,10 @@
 
 FROM gcr.io/oss-fuzz-base/base-builder-jvm
 
-RUN git clone --depth 1 https://github.com/google/fuzzing && \
-    mv fuzzing/dictionaries/json.dict $SRC/TomcatHttpParserFuzzer.dict && \
-    rm -rf fuzzing
-
-RUN git clone --depth 1 https://github.com/dvyukov/go-fuzz-corpus && \
-    zip -j $SRC/TomcatHttpParserFuzzer_seed_corpus.zip go-fuzz-corpus/json/corpus/* && \
-    rm -rf go-fuzz-corpus
+RUN curl -L https://dlcdn.apache.org//ant/binaries/apache-ant-1.10.12-bin.tar.gz -o ant.tar.gz && \
+    mkdir -p $SRC/ant && \
+    tar -zxvf ant.tar.gz -C $SRC/ant --strip-components=1 && \
+    rm -rf ant.tar.gz
 
 ARG java_home="/out/open-jdk-17"
 
@@ -30,6 +27,9 @@ RUN apt update && apt install -y openjdk-17-jdk
 ENV JAVA_HOME $java_home
 ENV PATH "${java_home}:${PATH}"
 ENV JVM_LD_LIBRARY_PATH "$java_home/lib/server"
+
+ENV ANT_HOME=$SRC/ant
+ENV ANT $SRC/ant/bin/ant
 
 RUN git clone --depth 1 https://github.com/apache/tomcat
 
