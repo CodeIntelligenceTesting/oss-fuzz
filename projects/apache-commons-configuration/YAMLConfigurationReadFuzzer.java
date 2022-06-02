@@ -10,12 +10,12 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 public class YAMLConfigurationReadFuzzer {
     public static void fuzzerTestOneInput(byte[] data) {
         // Create needed objects
-        YAMLConfiguration yaml_config  = new YAMLConfiguration();
-        InputStream       input_stream = new ByteArrayInputStream(data);
+        YAMLConfiguration yamlConfig = new YAMLConfiguration();
+        InputStream inputStream = new ByteArrayInputStream(data);
 
         try {
-            yaml_config.read(input_stream);
-        } catch ( ConfigurationException ignored ) {
+            yamlConfig.read(inputStream);
+        } catch (ConfigurationException ignored) {
             // expected Exceptions get ignored
         }
     }

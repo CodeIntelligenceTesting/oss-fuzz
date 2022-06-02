@@ -13,31 +13,31 @@ import org.apache.commons.configuration2.io.FileHandler;
 public class XMLConfigurationLoadFuzzer {
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
         // Create needed objects
-        final File temp_file;
+        final File tempFile;
         try {
-            temp_file = File.createTempFile("XMLConfiguration", "xml");
-            temp_file.deleteOnExit();
-        } catch ( IOException ioe ) {
+            tempFile = File.createTempFile("XMLConfiguration", "xml");
+            tempFile.deleteOnExit();
+        } catch (IOException ioe) {
             // Preparations failed ; exit early
             return;
         }
-        final String absolute_filepath = temp_file.getAbsolutePath();
+        final String absoluteFilepath = tempFile.getAbsolutePath();
 
         try {
-            final FileWriter file_writer = new FileWriter(temp_file);
-            file_writer.write(data.consumeRemainingAsString());
-            file_writer.close();
-        } catch ( IOException ioe ) {
+            final FileWriter fileWriter = new FileWriter(tempFile);
+            fileWriter.write(data.consumeRemainingAsString());
+            fileWriter.close();
+        } catch (IOException ioe) {
             // Preparations failed ; exit early
             return;
         }
 
-        final FileHandler file_handler = new FileHandler(new XMLConfiguration());
-        file_handler.setPath(absolute_filepath);
+        final FileHandler fileHandler = new FileHandler(new XMLConfiguration());
+        fileHandler.setPath(absoluteFilepath);
 
         try {
-            file_handler.load();
-        } catch ( ConfigurationException ignored ) {
+            fileHandler.load();
+        } catch (ConfigurationException ignored) {
             // expected Exceptions get ignored
         }
     }

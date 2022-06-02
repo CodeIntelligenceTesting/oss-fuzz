@@ -10,23 +10,23 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 public class JSONConfigurationReadFuzzer {
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
         // Create helper objects from fuzzer data
-        final boolean use_reader = data.consumeBoolean();
-        final byte[]  byte_array = data.consumeBytes(Integer.MAX_VALUE);
+        final boolean useReader = data.consumeBoolean();
+        final byte[] byteArray = data.consumeBytes(Integer.MAX_VALUE);
 
         // Create needed objects
-        final JSONConfiguration json_config  = new JSONConfiguration();
-        final InputStream       input_stream = new ByteArrayInputStream(byte_array);
+        final JSONConfiguration jsonConfig = new JSONConfiguration();
+        final InputStream inputStream = new ByteArrayInputStream(byteArray);
         final InputStreamReader reader;
 
         try {
-            if ( use_reader ) {
-                reader = new InputStreamReader(input_stream);
-                json_config.read(reader);
+            if (useReader) {
+                reader = new InputStreamReader(inputStream);
+                jsonConfig.read(reader);
             } else {
-                json_config.read(input_stream);
+                jsonConfig.read(inputStream);
             }
 
-        } catch ( ConfigurationException ignored ) {
+        } catch (ConfigurationException ignored) {
             // expected Exceptions get ignored
         }
     }

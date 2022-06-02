@@ -11,14 +11,14 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 public class YAMLConfigurationWriteFuzzer {
     public static void fuzzerTestOneInput(byte[] data) {
         // Create needed objects
-        YAMLConfiguration yaml_config  = new YAMLConfiguration();
-        InputStream       input_stream = new ByteArrayInputStream(data);
-        StringWriter      writer       = new StringWriter();
+        YAMLConfiguration yamlConfig = new YAMLConfiguration();
+        InputStream inputStream = new ByteArrayInputStream(data);
+        StringWriter writer = new StringWriter();
 
         try {
-            yaml_config.read(input_stream);
-            yaml_config.write(writer);
-        } catch ( IOException | ConfigurationException ignored ) {
+            yamlConfig.read(inputStream);
+            yamlConfig.write(writer);
+        } catch (IOException | ConfigurationException ignored) {
             // expected Exceptions get ignored
         }
     }

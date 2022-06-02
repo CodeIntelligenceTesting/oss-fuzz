@@ -1,4 +1,12 @@
-homepage: "<your_project_homepage>"
+homepage: "https://commons.apache.org/proper/commons-configuration/"
 language: jvm
-primary_contact: "<primary_contact_email>"
-main_repo: "https://path/to/main/repo.git"
+main_repo: "https://gitbox.apache.org/repos/asf/commons-configuration.git"
+fuzzing_engines:
+ - libfuzzer
+sanitizers:
+ - address
+vendor_ccs:
+ - "wagner@code-intelligence.com"
+ - "yakdan@code-intelligence.com"
+ - "glendowne@code-intelligence.com"
+ - "patrice.salathe@code-intelligence.com"

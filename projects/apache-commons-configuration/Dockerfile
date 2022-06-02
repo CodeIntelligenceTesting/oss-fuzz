@@ -34,20 +34,18 @@ RUN cp fuzzing/dictionaries/xml.dict $SRC/XMLConfigurationLoadFuzzer.dict
 RUN cp fuzzing/dictionaries/yaml.dict $SRC/YAMLConfigurationReadFuzzer.dict
 RUN cp $SRC/YAMLConfigurationReadFuzzer.dict $SRC/YAMLConfigurationWriteFuzzer.dict
 
-RUN cp fuzzing/dictionaries/json.dict $SRC/JSONConfigurationFuzzer.dict
+RUN cp fuzzing/dictionaries/json.dict $SRC/JSONConfigurationReadFuzzer.dict
+RUN cp $SRC/JSONConfigurationReadFuzzer.dict $SRC/JSONConfigurationWriteFuzzer.dict
 
 COPY ini.dict $SRC/INIConfigurationReadFuzzer.dict
 RUN cp $SRC/INIConfigurationReadFuzzer.dict $SRC/INIConfigurationWriteFuzzer.dict
 
 # Get the corpora
 RUN git clone --depth=1 "https://github.com/dvyukov/go-fuzz-corpus" corpora
-COPY yaml.org.yml $SRC/
 RUN zip -q $SRC/XMLConfigurationLoadFuzzer_seed_corpus.zip corpora/xml/corpus/*
 
-RUN zip -q $SRC/YAMLConfigurationReadFuzzer_seed_corpus.zip yaml.org.yml
-RUN cp $SRC/YAMLConfigurationReadFuzzer_seed_corpus.zip $SRC/YAMLConfigurationWriteFuzzer_seed_corpus.zip
-
-RUN zip -q $SRC/JSONConfigurationFuzzer_seed_corpus.zip corpora/json/corpus/*
+RUN zip -q $SRC/JSONConfigurationReadFuzzer_seed_corpus.zip corpora/json/corpus/*
+RUN cp $SRC/JSONConfigurationReadFuzzer_seed_corpus.zip $SRC/JSONConfigurationWriteFuzzer_seed_corpus.zip
 
 # Copy the build script and all the fuzztargets
 COPY build.sh $SRC/

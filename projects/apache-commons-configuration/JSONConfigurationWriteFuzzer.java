@@ -12,24 +12,24 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 public class JSONConfigurationWriteFuzzer {
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
         // Create helper objects from fuzzer data
-        final boolean use_reader = data.consumeBoolean();
-        final byte[]  byte_array = data.consumeBytes(Integer.MAX_VALUE);
+        final boolean useReader = data.consumeBoolean();
+        final byte[] byteArray = data.consumeBytes(Integer.MAX_VALUE);
 
         // Create needed objects
-        JSONConfiguration json_config  = new JSONConfiguration();
-        InputStream       input_stream = new ByteArrayInputStream(byte_array);
+        JSONConfiguration jsonConfig = new JSONConfiguration();
+        InputStream inputStream = new ByteArrayInputStream(byteArray);
         InputStreamReader reader;
-        StringWriter      writer       = new StringWriter();
+        StringWriter writer = new StringWriter();
 
         try {
-            if ( use_reader ) {
-                reader = new InputStreamReader(input_stream);
-                json_config.read(reader);
+            if (useReader) {
+                reader = new InputStreamReader(inputStream);
+                jsonConfig.read(reader);
             } else {
-                json_config.read(input_stream);
+                jsonConfig.read(inputStream);
             }
-            json_config.write(writer);
-        } catch ( IOException | ConfigurationException ignored ) {
+            jsonConfig.write(writer);
+        } catch (IOException | ConfigurationException ignored) {
             // expected Exceptions get ignored
         }
     }
