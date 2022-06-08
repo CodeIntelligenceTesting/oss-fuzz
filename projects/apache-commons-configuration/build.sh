@@ -19,8 +19,6 @@
 mv $SRC/{*.zip,*.dict} $OUT
 
 # Building the library
-cd $SRC/commons-configuration
-
 MAVEN_ARGS="--no-transfer-progress -Dmaven.test.skip=true -Djavac.src.version=15 -Djavac.target.version=15 -Djdk.version=15"
 
 CURRENT_VERSION=$($MVN org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate \

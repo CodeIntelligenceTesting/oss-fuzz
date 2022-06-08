@@ -15,7 +15,6 @@
 ################################################################################
 
 FROM gcr.io/oss-fuzz-base/base-builder-jvm
-RUN apt-get update && apt-get install -y make autoconf automake libtool
 
 # Install a working version of Maven
 RUN curl -L https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.zip -o maven.zip && \
@@ -50,4 +49,4 @@ RUN cp $SRC/JSONConfigurationReadFuzzer_seed_corpus.zip $SRC/JSONConfigurationWr
 # Copy the build script and all the fuzztargets
 COPY build.sh $SRC/
 COPY *Fuzzer.java $SRC/
-WORKDIR $SRC/
+WORKDIR $SRC/commons-configuration
