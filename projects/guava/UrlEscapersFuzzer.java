@@ -58,52 +58,14 @@ public class UrlEscapersFuzzer {
 		return false;
 	}
 
-	public static void testUrlFormParameterEscaper(String sample) {
-		/*
-		 * "handle" CR and LF
-		 */
-		if(sample.contains("\n") || sample.contains("\r")) {
-			throw new IllegalArgumentException();
-		}
+	public static void testUrlEscaper(Escaper escaper, String additionalSafeChars, String sample, boolean plusIsSpace) {
+		String encoded = escaper.escape(sample);
 
-		String encoded = UrlEscapers.urlFormParameterEscaper().escape(sample);
-
-		if (containsUnsafeCharacters(encoded, URL_FORM_PARAMETER_OTHER_SAFE_CHARS + "+")) {
-			rejectSample(sample, "<null>", encoded, "<null>");
-		}
-		String percentEncoded = encoded.replace("+", "%20");
-
-		String decoded = URLDecoder.decode(percentEncoded, Charsets.UTF_8);
-
-		if (!decoded.equals(sample)) {
-			rejectSample(sample, decoded, encoded, percentEncoded);
-		}
-	}
-
-	public static void testUrlPathSegmentEscaper(String sample) {
-		String encoded = UrlEscapers.urlPathSegmentEscaper().escape(sample);
-
-		if (containsUnsafeCharacters(encoded, URL_PATH_OTHER_SAFE_CHARS_LACKING_PLUS + "+")) {
+		if (containsUnsafeCharacters(encoded, additionalSafeChars)) {
 			rejectSample(sample, "<null>", encoded, "<null>");
 		}
 
-		String percentEncoded = encoded.replace("+", "%2B");
-
-		String decoded = URLDecoder.decode(percentEncoded, Charsets.UTF_8);
-
-		if (!decoded.equals(sample)) {
-			rejectSample(sample, decoded, encoded, percentEncoded);
-		}
-	}
-
-	public static void testUrlFragmentEscaper(String sample) {
-		String encoded = UrlEscapers.urlFragmentEscaper().escape(sample);
-
-		if (containsUnsafeCharacters(encoded, URL_PATH_OTHER_SAFE_CHARS_LACKING_PLUS + "+/?")) {
-			rejectSample(sample, "<null>", encoded, "<null>");
-		}
-
-		String percentEncoded = encoded.replace("+", "%2B");
+		String percentEncoded = encoded.replace("+", (plusIsSpace? "%20":"%2B"));
 
 		String decoded = URLDecoder.decode(percentEncoded, Charsets.UTF_8);
 
@@ -116,9 +78,9 @@ public class UrlEscapersFuzzer {
 		String value = data.consumeRemainingAsString();
 		
 		try {
-			testUrlFormParameterEscaper(value);
-			testUrlFragmentEscaper(value);
-			testUrlPathSegmentEscaper(value);
+			testUrlEscaper(UrlEscapers.urlFormParameterEscaper(), URL_FORM_PARAMETER_OTHER_SAFE_CHARS + "+",      value, true);
+			testUrlEscaper(UrlEscapers.urlFragmentEscaper(),      URL_PATH_OTHER_SAFE_CHARS_LACKING_PLUS + "+/?", value, false);
+			testUrlEscaper(UrlEscapers.urlPathSegmentEscaper(),   URL_PATH_OTHER_SAFE_CHARS_LACKING_PLUS + "+",   value, false);
 		} catch (IllegalArgumentException e) {
 			/* ignore */
 	    }
