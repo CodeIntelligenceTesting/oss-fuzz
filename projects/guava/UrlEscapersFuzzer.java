@@ -41,7 +41,7 @@ public class UrlEscapersFuzzer {
 		
 		safe += additionalSafeChars;
 
-		for (int i=0; i<string.length(); ++i) {
+		for (int i = 0; i < string.length(); ++i) {
 			if (safe.indexOf(string.charAt(i)) < 0) {
 				return true;
 			}
@@ -56,7 +56,7 @@ public class UrlEscapersFuzzer {
 			rejectSample(sample, "<null>", encoded, "<null>");
 		}
 
-		String percentEncoded = encoded.replace("+", (plusIsSpace? "%20":"%2B"));
+		String percentEncoded = encoded.replace("+", (plusIsSpace ? "%20" : "%2B"));
 
 		String decoded = URLDecoder.decode(percentEncoded, Charsets.UTF_8);
 
