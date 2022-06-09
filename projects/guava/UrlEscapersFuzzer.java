@@ -1,10 +1,10 @@
 import com.code_intelligence.jazzer.api.FuzzedDataProvider;
-import com.code_intelligence.jazzer.api.FuzzerSecurityIssueHigh;
+import com.code_intelligence.jazzer.api.FuzzerSecurityIssueMedium;
+import com.code_intelligence.jazzer.api.FuzzerSecurityIssueLow;
 import com.google.common.base.Charsets;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import java.lang.IllegalArgumentException;
-import java.math.BigInteger;
 import java.net.URLDecoder;
 
 public class UrlEscapersFuzzer {
@@ -18,18 +18,6 @@ public class UrlEscapersFuzzer {
       "-._~" // Unreserved characters.
           + "!$'()*,;&=" // The subdelim characters (excluding '+').
           + "@:"; // The gendelim characters permitted in paths.
-
-    private static String toHex(String arg) {
-		return String.format("%x", new BigInteger(1, arg.getBytes(Charsets.UTF_8)));
-	}
-
-	private static void rejectSample(String original, String result, String encoded, String percentEncoded) {
-		System.out.println("sample: " + toHex(original));
-		System.out.println("encoded: " + encoded);
-		System.out.println("percentEncoded: " + percentEncoded);
-		System.out.println("result: " + toHex(result));
-		throw new RuntimeException();
-	}
 
 	private static boolean containsUnsafeCharacters(String string, String additionalSafeChars) {
 		String safe = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -53,7 +41,7 @@ public class UrlEscapersFuzzer {
 		String encoded = escaper.escape(sample);
 
 		if (containsUnsafeCharacters(encoded, additionalSafeChars)) {
-			rejectSample(sample, "<null>", encoded, "<null>");
+			throw new FuzzerSecurityIssueMedium("unsafe character was not escaped");
 		}
 
 		String percentEncoded = encoded.replace("+", (plusIsSpace ? "%20" : "%2B"));
@@ -61,7 +49,7 @@ public class UrlEscapersFuzzer {
 		String decoded = URLDecoder.decode(percentEncoded, Charsets.UTF_8);
 
 		if (!decoded.equals(sample)) {
-			rejectSample(sample, decoded, encoded, percentEncoded);
+			throw new FuzzerSecurityIssueLow("escaped sequence not being decoded as expected");
 		}
 	}
 
