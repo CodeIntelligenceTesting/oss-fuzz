@@ -31,15 +31,6 @@ public class UrlEscapersFuzzer {
 		throw new RuntimeException();
 	}
 
-	private static boolean contains(String string, char character) {
-		for (int i=0; i<string.length(); ++i) {
-			if (string.charAt(i) == character) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	private static boolean containsUnsafeCharacters(String string, String additionalSafeChars) {
 		String safe = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		
@@ -51,7 +42,7 @@ public class UrlEscapersFuzzer {
 		safe += additionalSafeChars;
 
 		for (int i=0; i<string.length(); ++i) {
-			if (!contains(safe, string.charAt(i))) {
+			if (safe.indexOf(string.charAt(i)) < 0) {
 				return true;
 			}
 		}
