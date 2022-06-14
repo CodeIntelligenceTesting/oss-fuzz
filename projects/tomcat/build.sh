@@ -68,6 +68,7 @@ for fuzzer in $(find $SRC -name '*Fuzzer.java'); do
   javac -cp $BUILD_CLASSPATH $fuzzer --release 17
   cp $SRC/[$fuzzer_basename]*.class $OUT/
 
+
   # Create an execution wrapper that executes Jazzer with the correct arguments.
   echo "#!/bin/sh
 # LLVMFuzzerTestOneInput for fuzzer detection.
