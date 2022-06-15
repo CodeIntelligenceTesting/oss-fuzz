@@ -17,12 +17,44 @@
 
 cp -r "/usr/lib/jvm/java-17-openjdk-amd64/" "$JAVA_HOME"
 
+echo 'diff --git a/build.xml b/build.xml
+index 2a67d5346f..6c53a163cd 100644
+--- a/build.xml
++++ b/build.xml
+@@ -219,6 +219,7 @@
+     <pathelement location="${jaxrpc-lib.jar}"/>
+     <pathelement location="${wsdl4j-lib.jar}"/>
+     <pathelement location="${migration-lib.jar}"/>
++    <pathelement location="${unboundid.jar}"/>
+   </path>
+ 
+   <path id="tomcat.classpath">
+@@ -3180,6 +3181,15 @@ skip.installer property in build.properties" />
+       <param name="checksum.value" value="${migration-lib.checksum.value}"/>
+     </antcall>
+ 
++    <antcall target="downloadfile">
++      <param name="sourcefile" value="${unboundid.loc}"/>
++      <param name="destfile" value="${unboundid.jar}"/>
++      <param name="destdir" value="${unboundid.home}"/>
++      <param name="checksum.enabled" value="${unboundid.checksum.enabled}"/>
++      <param name="checksum.algorithm" value="${unboundid.checksum.algorithm}"/>
++      <param name="checksum.value" value="${unboundid.checksum.value}"/>
++    </antcall>
++
+   </target>
+ 
+   <target name="download-test-compile"' > patch.diff
+
+git apply patch.diff
+
 $ANT
 
-cp "output/build/lib/tomcat-coyote.jar" "$OUT/tomcat-coyote.jar"
-cp "output/build/lib/tomcat-util.jar" "$OUT/tomcat-util.jar"
+cd $SRC/tomcat/output/classes && jar cfv classes.jar . && mv ./classes.jar $OUT && cd $SRC/tomcat
 
-ALL_JARS="tomcat-coyote.jar tomcat-util.jar"
+cp /root/tomcat-build-libs/unboundid*/unboundid*.jar $OUT/unboundid-ldapsdk.jar
+
+ALL_JARS="classes.jar unboundid-ldapsdk.jar"
 
 # The classpath at build-time includes the project jars in $OUT as well as the
 # Jazzer API.
@@ -34,7 +66,7 @@ RUNTIME_CLASSPATH=$(echo $ALL_JARS | xargs printf -- "\$this_dir/%s:"):\$this_di
 for fuzzer in $(find $SRC -name '*Fuzzer.java'); do
   fuzzer_basename=$(basename -s .java $fuzzer)
   javac -cp $BUILD_CLASSPATH $fuzzer --release 17
-  cp $SRC/$fuzzer_basename.class $OUT/
+  cp $SRC/[$fuzzer_basename]*.class $OUT/
 
   # Create an execution wrapper that executes Jazzer with the correct arguments.
   echo "#!/bin/sh
