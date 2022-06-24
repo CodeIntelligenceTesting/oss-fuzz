@@ -159,10 +159,6 @@ public class HashingFuzzer {
 			testHash(Hashing.crc32(), hashInputData);
 			testHash(Hashing.crc32c(), hashInputData);
 			testHash(Hashing.farmHashFingerprint64(), hashInputData);
-			//// undocumented exception with minimumBits < 0
-			//if (minimumBits <= 0) { 
-			//	minimumBits = 1 - minimumBits;
-			//}
 			testHash(Hashing.goodFastHash(minimumBits), hashInputData);
 			testHash(Hashing.murmur3_128(), hashInputData);
 			testHash(Hashing.murmur3_128(seed), hashInputData);
