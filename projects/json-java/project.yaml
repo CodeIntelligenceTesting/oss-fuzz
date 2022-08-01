@@ -8,3 +8,5 @@ fuzzing_engines:
   - libfuzzer
 sanitizers:
   - address
+vendor_ccs:
+- hlin@code-intelligence.com

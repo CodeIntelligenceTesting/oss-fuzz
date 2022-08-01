@@ -10,3 +10,5 @@ fuzzing_engines:
 main_repo: "https://github.com/apache/arrow.git"
 sanitizers:
   - address
+vendor_ccs:
+- hlin@code-intelligence.com

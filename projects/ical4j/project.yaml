@@ -4,3 +4,5 @@ primary_contact: "fortuna@micronode.com"
 sanitizers:
   - address
 main_repo: 'https://github.com/ical4j/ical4j.git'
+vendor_ccs:
+- hlin@code-intelligence.com
