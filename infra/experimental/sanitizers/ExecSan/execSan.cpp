@@ -66,6 +66,12 @@ const std::string kTripWire = "/tmp/tripwire";
 const std::string kInjectionError = "Shell injection";
 // Shell corruption bug detected based on syntax error.
 const std::string kCorruptionError = "Shell corruption";
+// The magic string that we'll use to detect arbitrary file open
+const std::string kFzAbsoluteDirectory = "/fz/";
+// Arbitrary file open in /fz/
+const std::string kArbitraryFileOpenError = "Arbitrary file open";
+// Assuming only shorter (than this constant) top dir are legitly used.
+constexpr int kRootDirMaxLength = 16;
 
 // The PID of the root process we're fuzzing.
 pid_t g_root_pid;
@@ -177,8 +183,7 @@ void report_bug(std::string bug_type) {
   // to the root process.
   // Note: this may not be reliable or consistent if shell injection happens
   // in an async way.
-  kill(g_root_pid, SIGABRT);
-  _exit(0);
+  tgkill(g_root_pid, g_root_pid, SIGABRT);
 }
 
 void inspect_for_injection(pid_t pid, const user_regs_struct &regs) {
@@ -265,6 +270,28 @@ void inspect_for_corruption(pid_t pid, const user_regs_struct &regs) {
   std::string buffer = read_string(pid, regs.rsi, regs.rdx);
   debug_log("Write buffer: %s\n", buffer.c_str());
   match_error_pattern(buffer, g_shell_pids[pid]);
+}
+
+void inspect_for_arbitrary_file_open(pid_t pid, const user_regs_struct &regs) {
+  // Inspect a PID's register for the sign of arbitrary file open.
+  std::string path = read_string(pid, regs.rsi, kRootDirMaxLength);
+  if (!path.length()) {
+    return;
+  }
+  if (path.substr(0, kFzAbsoluteDirectory.length()) == kFzAbsoluteDirectory) {
+    report_bug(kArbitraryFileOpenError);
+  }
+  if (path[0] == '/' && path.length() > 1) {
+    std::string path_absolute_topdir = path;
+    size_t root_dir_end = path.find('/', 1);
+    if (root_dir_end != std::string::npos) {
+      path_absolute_topdir = path.substr(0, root_dir_end);
+    }
+    struct stat dirstat;
+    if (stat(path_absolute_topdir.c_str(), &dirstat) != 0) {
+      report_bug(kArbitraryFileOpenError);
+    }
+  }
 }
 
 int trace(std::map<pid_t, Tracee> pids) {
@@ -359,6 +386,10 @@ int trace(std::map<pid_t, Tracee> pids) {
               debug_log("Shell parsed: %s", shell.c_str());
               g_shell_pids.insert(std::make_pair(pid, shell));
             }
+          }
+
+          if (regs.orig_rax == __NR_openat) {
+            inspect_for_arbitrary_file_open(pid, regs);
           }
 
           if (regs.orig_rax == __NR_write &&

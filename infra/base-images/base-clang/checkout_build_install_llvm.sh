@@ -15,10 +15,7 @@
 #
 ################################################################################
 
-# See issue #4270. The compiler crashes on GCB instance with 32 vCPUs, so when
-# we compile on GCB we want 16 cores. But locally we want more (so use nproc /
-# 2).
-NPROC=$(expr $(nproc) / 2)
+NPROC=$(nproc)
 
 # zlib1g-dev is needed for llvm-profdata to handle coverage data from rust compiler
 LLVM_DEP_PACKAGES="build-essential make cmake ninja-build git python3 python3-distutils g++-multilib binutils-dev zlib1g-dev"
@@ -107,8 +104,8 @@ if [ -n "$INTROSPECTOR_PATCHES" ]; then
   echo "Applying introspector changes"
   OLD_WORKING_DIR=$PWD
   cd $LLVM_SRC
-  cp -rf /fuzz-introspector/llvm/include/llvm/Transforms/FuzzIntrospector/ ./llvm/include/llvm/Transforms/FuzzIntrospector
-  cp -rf /fuzz-introspector/llvm/lib/Transforms/FuzzIntrospector ./llvm/lib/Transforms/FuzzIntrospector
+  cp -rf /fuzz-introspector/frontends/llvm/include/llvm/Transforms/FuzzIntrospector/ ./llvm/include/llvm/Transforms/FuzzIntrospector
+  cp -rf /fuzz-introspector/frontends/llvm/lib/Transforms/FuzzIntrospector ./llvm/lib/Transforms/FuzzIntrospector
 
   # LLVM currently does not support dynamically loading LTO passes. Thus,
   # we hardcode it into Clang instead.
@@ -191,18 +188,6 @@ cmake_libcxx $CMAKE_EXTRA_ARGS \
 ninja -j $NPROC cxx
 ninja install-cxx
 rm -rf $WORK/msan
-
-# DataFlowSanitizer instrumented libraries.
-mkdir -p $WORK/dfsan
-cd $WORK/dfsan
-
-cmake_libcxx $CMAKE_EXTRA_ARGS \
-    -DLLVM_USE_SANITIZER=DataFlow \
-    -DCMAKE_INSTALL_PREFIX=/usr/dfsan/
-
-ninja -j $NPROC cxx cxxabi
-ninja install-cxx install-cxxabi
-rm -rf $WORK/dfsan
 
 # libFuzzer sources.
 cp -r $LLVM_SRC/compiler-rt/lib/fuzzer $SRC/libfuzzer
