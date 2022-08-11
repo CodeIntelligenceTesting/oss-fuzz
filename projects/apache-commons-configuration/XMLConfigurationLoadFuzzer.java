@@ -32,7 +32,10 @@ public class XMLConfigurationLoadFuzzer {
             return;
         }
 
-        final FileHandler fileHandler = new FileHandler(new XMLConfiguration());
+        final XMLConfiguration xmlConfig = new XMLConfiguration();
+        xmlConfig.setLogger(null); // disable logger
+
+        final FileHandler fileHandler = new FileHandler(xmlConfig);
         fileHandler.setPath(absoluteFilepath);
 
         try {
