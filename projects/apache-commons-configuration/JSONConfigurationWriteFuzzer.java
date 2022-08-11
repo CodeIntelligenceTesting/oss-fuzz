@@ -17,6 +17,8 @@ public class JSONConfigurationWriteFuzzer {
 
         // Create needed objects
         JSONConfiguration jsonConfig = new JSONConfiguration();
+        jsonConfig.setLogger(null); // disable logger
+
         InputStream inputStream = new ByteArrayInputStream(byteArray);
         InputStreamReader reader;
         StringWriter writer = new StringWriter();
