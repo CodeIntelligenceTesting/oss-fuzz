@@ -57,9 +57,8 @@ public class YAMLConfigurationReadFuzzer {
         loaderOptions.setProcessComments(data.consumeBoolean());
         loaderOptions.setEnumCaseSensitive(data.consumeBoolean());
 
-        // seems to not yet be implemented in the version that apache-commons-configuration2 uses
-        // loaderOptions.setNestingDepthLimit(data.consumeInt(50, 100)); // 50 as minimum as that is
-        // the default value
+        // seems to not yet be implemented in the version that apache-commons-configuration2 uses (2022-08-10)
+        // loaderOptions.setNestingDepthLimit(data.consumeInt(50, 100)); // 50 as minimum as that is the default value
 
         return loaderOptions;
     }
