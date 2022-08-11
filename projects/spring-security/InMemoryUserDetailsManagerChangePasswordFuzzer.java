@@ -16,7 +16,6 @@ public class InMemoryUserDetailsManagerChangePasswordFuzzer {
     private final static String USER_ROLE = "ADMIN";
 
     // Values chosen without heuristics or logic
-    private final static int LENGTH_USERNAME = 100;
     private final static int LENGTH_PASSWORD = 500;
 
     public static void fuzzerInitialize() {
@@ -25,13 +24,11 @@ public class InMemoryUserDetailsManagerChangePasswordFuzzer {
 
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
         // generating needed objects
-        final String username = data.consumeString(LENGTH_USERNAME);
         final String initialPassword = data.consumeString(LENGTH_PASSWORD);
         final String newPassword = data.consumeRemainingAsString();
 
         // check if the fuzzer generated useful data
-        if (username.equals(USERNAME)
-            && (initialPassword.equals(PASSWORD) || newPassword.equals(PASSWORD))) {
+        if (initialPassword.equals(PASSWORD) || newPassword.equals(PASSWORD)) {
             return;
         }
 
@@ -41,23 +38,18 @@ public class InMemoryUserDetailsManagerChangePasswordFuzzer {
         authorities.add(authority);
 
         final User user = new User(USERNAME, PASSWORD, authorities);
-
         final InMemoryUserDetailsManager userDetailsManager = new InMemoryUserDetailsManager(user);
 
         try {
             userDetailsManager.changePassword(initialPassword, newPassword);
 
-            if (newPassword.equals(
-                    ((User) userDetailsManager.loadUserByUsername(USERNAME)).getPassword())) {
-                throw new FuzzerSecurityIssueHigh(
-                    "Password was changed from '" + initialPassword + "' to '" + newPassword + "'");
+            if (newPassword.equals(((User) userDetailsManager.loadUserByUsername(USERNAME)).getPassword())) {
+                throw new FuzzerSecurityIssueHigh("Password was changed from '" + initialPassword +
+                        "' to '" + newPassword + "'");
             }
         } catch (UsernameNotFoundException err) {
-            throw new FuzzerSecurityIssueHigh(
-                "user disappeared from the InMemoryUserDetailsManager");
-        } catch (AccessDeniedException err) { // TODO: make it so the exception stops being thrown
-            // System.err.println(SecurityContextHolder.getContext().toString());
-            // err.printStackTrace();
+            throw new FuzzerSecurityIssueHigh("user disappeared from the InMemoryUserDetailsManager");
+        } catch (AccessDeniedException ignored) {
             return;
         }
     }
