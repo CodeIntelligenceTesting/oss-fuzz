@@ -46,7 +46,7 @@ index c4f6c08..413b992 100644
 EOM
 
 # pipe into true to make subsequent executions of build.sh inside the docker shell possible
-git apply patch.diff | true
+git apply patch.diff
 
 
 CURRENT_VERSION=$(./gradlew properties --no-daemon --console=plain | sed -nr "s/^version:\ (.*)/\1/p")
