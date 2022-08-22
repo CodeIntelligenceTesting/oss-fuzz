@@ -31,7 +31,7 @@ public class XMLConfigurationLoadFuzzer {
             // Preparations failed ; exit early
             return;
         }
-
+        
         final XMLConfiguration xmlConfig = new XMLConfiguration();
         xmlConfig.setLogger(null); // disable logger
 
