@@ -15,6 +15,8 @@ public class JSONConfigurationReadFuzzer {
 
         // Create needed objects
         final JSONConfiguration jsonConfig = new JSONConfiguration();
+        jsonConfig.setLogger(null); // disable logger
+
         final InputStream inputStream = new ByteArrayInputStream(byteArray);
         final InputStreamReader reader;
 
