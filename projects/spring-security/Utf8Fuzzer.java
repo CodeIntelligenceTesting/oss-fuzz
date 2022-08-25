@@ -1,5 +1,5 @@
 import com.code_intelligence.jazzer.api.FuzzedDataProvider;
-import com.code_intelligence.jazzer.api.FuzzerSecurityIssueHigh;
+import com.code_intelligence.jazzer.api.FuzzerSecurityIssueLow;
 
 import java.lang.CharSequence;
 
@@ -14,7 +14,7 @@ public class Utf8Fuzzer {
             encodedBytes = Utf8.encode(initialString);
 
             if (! initialString.equals(Utf8.decode(encodedBytes))) {
-                throw new FuzzerSecurityIssueHigh("Utf8 value has changed during encoding and decoding");
+                throw new FuzzerSecurityIssueLow("Utf8 value has changed during encoding and decoding");
             }
         } catch (IllegalArgumentException err) {
             // ignore expected exceptions

@@ -1,4 +1,4 @@
-import com.code_intelligence.jazzer.api.FuzzerSecurityIssueHigh;
+import com.code_intelligence.jazzer.api.FuzzerSecurityIssueLow;
 
 import java.lang.CharSequence;
 
@@ -13,7 +13,7 @@ public class HexFuzzer {
             encodedChars = Hex.encode(initialByteArray);
 
             if (! initialByteArray.toString().equals(Hex.decode(encodedChars.toString()))) {
-                throw new FuzzerSecurityIssueHigh("Hex value has changed during encoding and decoding");
+                throw new FuzzerSecurityIssueLow("Hex value has changed during encoding and decoding");
             }
         } catch (IllegalArgumentException err) {
             // ignore expected exceptions

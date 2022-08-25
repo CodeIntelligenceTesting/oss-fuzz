@@ -10,7 +10,6 @@ public class EncodingUtilsConcatenateFuzzer {
     }
 
     // Constants to reduce cases of fuzzer running out of memory
-    // Values chosen without heuristics or logic
     private final static int MIN_OUTER_LENGTH = 500;
     private final static int MAX_OUTER_LENGTH = 1000;
     private final static int MIN_INNER_LENGTH = 320;

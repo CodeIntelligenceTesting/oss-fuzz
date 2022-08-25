@@ -1,4 +1,5 @@
 import com.code_intelligence.jazzer.api.FuzzedDataProvider;
+import com.code_intelligence.jazzer.api.FuzzerSecurityIssueLow;
 import com.code_intelligence.jazzer.api.FuzzerSecurityIssueHigh;
 
 import java.util.List;
@@ -18,7 +19,6 @@ public class InMemoryUserDetailsManagerChangePasswordFuzzer {
     private final static String USER_ROLE = "ADMIN";
     private static final List<GrantedAuthority> AUTHORITIES = AuthorityUtils.createAuthorityList(USER_ROLE);
 
-    // Values chosen without heuristics or logic
     private final static int LENGTH_PASSWORD = 500;
 
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
@@ -36,10 +36,9 @@ public class InMemoryUserDetailsManagerChangePasswordFuzzer {
         final InMemoryUserDetailsManager userDetailsManager = new InMemoryUserDetailsManager(user);
 
         // set the SecurityContext
-        // both options below make it so that InMemoryUserDetailsManager.changePassword(old, new) does not actually check the old password
+        // this makes it so that InMemoryUserDetailsManager.changePassword(old, new) never actually checks the old password
         SecurityContextHolder.getContext().setAuthentication(
             UsernamePasswordAuthenticationToken.authenticated(USERNAME, PASSWORD, AUTHORITIES));
-        // SecurityContextHolder.getContext().setAuthentication(UsernamePasswordAuthenticationToken.unauthenticated(USERNAME, PASSWORD));
 
         try {
             userDetailsManager.changePassword(generatedPassword01, generatedPassword02);
@@ -50,7 +49,7 @@ public class InMemoryUserDetailsManagerChangePasswordFuzzer {
                 throw new FuzzerSecurityIssueHigh("Password was not changed to '" + finalPassword + "'");
             }
         } catch (UsernameNotFoundException err) {
-            throw new FuzzerSecurityIssueHigh("The user disappeared from the InMemoryUserDetailsManager");
+            throw new FuzzerSecurityIssueLow("The user disappeared from the InMemoryUserDetailsManager");
         } catch (AccessDeniedException problem) {
             // should not be thrown anymore
             problem.printStackTrace();
