@@ -30,16 +30,14 @@ public class XMLConfigurationWriteFuzzer {
         }
 
         final XMLConfiguration xmlConfig = new XMLConfiguration();
-        xmlConfig.setLogger(null); // disable the logger
+        xmlConfig.setLogger(ConfigurationLogger.newDummyLogger());
 
         final FileHandler fileHandler = new FileHandler(xmlConfig);
         fileHandler.setPath(absoluteFilepath);
 
-        final StringWriter writer = new StringWriter();
-
         try {
             fileHandler.load();
-            xmlConfig.write(writer);
+            xmlConfig.write(new StringWriter());
         } catch (ConfigurationException | IOException ignored) {
             // expected Exceptions get ignored
         }

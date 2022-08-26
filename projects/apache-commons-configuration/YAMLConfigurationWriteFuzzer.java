@@ -3,7 +3,6 @@ import com.code_intelligence.jazzer.api.FuzzedDataProvider;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 import org.apache.commons.configuration2.YAMLConfiguration;
@@ -13,7 +12,6 @@ import org.yaml.snakeyaml.LoaderOptions;
 public class YAMLConfigurationWriteFuzzer {
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
         // Create helper objects from fuzzer data
-        final boolean useInputStream = data.consumeBoolean();
         final boolean useLoaderOptions = data.consumeBoolean();
 
         // Create needed objects
@@ -22,28 +20,11 @@ public class YAMLConfigurationWriteFuzzer {
 
         // the actual fuzzing starts here
         try {
-            final InputStream inputStream;
-            final InputStreamReader reader;
-            if (useInputStream) {
-                if (useLoaderOptions) {
-                    final LoaderOptions loaderOptions = createLoaderOptions(data);
-                    inputStream = new ByteArrayInputStream(data.consumeBytes(Integer.MAX_VALUE));
-                    yamlConfig.read(inputStream, loaderOptions);
-                } else {
-                    inputStream = new ByteArrayInputStream(data.consumeBytes(Integer.MAX_VALUE));
-                    yamlConfig.read(inputStream);
-                }
+            if (useLoaderOptions) {
+                final LoaderOptions loaderOptions = createLoaderOptions(data);
+                yamlConfig.read(new ByteArrayInputStream(data.consumeBytes(Integer.MAX_VALUE)), loaderOptions);
             } else {
-                if (useLoaderOptions) {
-                    final LoaderOptions loaderOptions = createLoaderOptions(data);
-                    inputStream = new ByteArrayInputStream(data.consumeBytes(Integer.MAX_VALUE));
-                    reader = new InputStreamReader(inputStream);
-                    yamlConfig.read(reader, loaderOptions);
-                } else {
-                    inputStream = new ByteArrayInputStream(data.consumeBytes(Integer.MAX_VALUE));
-                    reader = new InputStreamReader(inputStream);
-                    yamlConfig.read(reader);
-                }
+                yamlConfig.read(new ByteArrayInputStream(data.consumeBytes(Integer.MAX_VALUE)));
             }
 
             yamlConfig.write(new StringWriter());
@@ -59,9 +40,6 @@ public class YAMLConfigurationWriteFuzzer {
         loaderOptions.setAllowRecursiveKeys(data.consumeBoolean());
         loaderOptions.setProcessComments(data.consumeBoolean());
         loaderOptions.setEnumCaseSensitive(data.consumeBoolean());
-
-        // seems to not yet be implemented in the version that apache-commons-configuration2 uses (2022-08-10)
-        // loaderOptions.setNestingDepthLimit(data.consumeInt(50, 100)); // 50 as minimum as that is the default value
 
         return loaderOptions;
     }
