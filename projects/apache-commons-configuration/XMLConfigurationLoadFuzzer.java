@@ -2,8 +2,6 @@ import com.code_intelligence.jazzer.api.FuzzedDataProvider;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.apache.commons.configuration2.XMLConfiguration;
@@ -11,12 +9,13 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
 
 public class XMLConfigurationLoadFuzzer {
+    private static File tempFile = null;
+
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
         // Create needed objects
         final File tempFile;
         try {
             tempFile = File.createTempFile("XMLConfiguration", "xml");
-            tempFile.deleteOnExit();
         } catch (IOException ioe) {
             // Preparations failed ; exit early
             return;
@@ -42,6 +41,12 @@ public class XMLConfigurationLoadFuzzer {
             fileHandler.load();
         } catch (ConfigurationException ignored) {
             // expected Exceptions get ignored
+        }
+    }
+
+    public static void fuzzerTearDown() {
+        if (tempFile != null) {
+            tempFile.delete();
         }
     }
 }

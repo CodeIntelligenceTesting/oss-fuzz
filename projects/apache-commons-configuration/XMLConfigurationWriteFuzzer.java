@@ -7,18 +7,17 @@ import java.io.StringWriter;
 
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.configuration2.io.ConfigurationLogger;
 import org.apache.commons.configuration2.io.FileHandler;
 
 public class XMLConfigurationWriteFuzzer {
+    private static File tempFile = null;
+
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
         // Create needed objects
         final File tempFile;
         final String absoluteFilepath;
         try {
             tempFile = File.createTempFile("XMLConfiguration", "xml");
-            tempFile.deleteOnExit();
-
             absoluteFilepath = tempFile.getAbsolutePath();
 
             final FileWriter fileWriter = new FileWriter(tempFile);
@@ -30,7 +29,7 @@ public class XMLConfigurationWriteFuzzer {
         }
 
         final XMLConfiguration xmlConfig = new XMLConfiguration();
-        xmlConfig.setLogger(ConfigurationLogger.newDummyLogger());
+        xmlConfig.setLogger(null); // disable the logger
 
         final FileHandler fileHandler = new FileHandler(xmlConfig);
         fileHandler.setPath(absoluteFilepath);
@@ -40,6 +39,12 @@ public class XMLConfigurationWriteFuzzer {
             xmlConfig.write(new StringWriter());
         } catch (ConfigurationException | IOException ignored) {
             // expected Exceptions get ignored
+        }
+    }
+
+    public static void fuzzerTearDown() {
+        if (tempFile != null) {
+            tempFile.delete();
         }
     }
 }
