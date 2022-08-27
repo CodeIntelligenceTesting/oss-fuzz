@@ -25,7 +25,6 @@ public class FormBodyPartBuilderBuildFuzzer {
     private enum BodyType { ByteArray, File, InputStream, String }
 
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
-        // System.err.println("Before: " + data.remainingBytes()); // DEBUG
         final String builderName = data.consumeString(builderNameLength);
         final ContentBody contentBody;
         try {
@@ -44,7 +43,7 @@ public class FormBodyPartBuilderBuildFuzzer {
 
             builder.build();
         } catch (IllegalStateException ignored) {
-            return;
+            // ignore expected exceptions
         }
     }
 
