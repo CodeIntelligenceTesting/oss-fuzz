@@ -1,5 +1,4 @@
 import com.code_intelligence.jazzer.api.FuzzedDataProvider;
-import com.code_intelligence.jazzer.api.FuzzerSecurityIssueLow;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -10,14 +9,14 @@ import org.apache.hc.client5.http.entity.mime.FileBody;
 import org.apache.hc.core5.http.ContentType;
 
 public class FileBodyWriteToFuzzer {
-    private static final int fileNameLength = 255;
+    private static final int FILENAME_MAX_LENGTH = 255;
 
     private static File tempFile = null;
 
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
         // Create objects from fuzzer input
         final ContentType contentType = data.pickValue(contentTypes);
-        final String filename = data.consumeString(fileNameLength);
+        final String filename = data.consumeString(FILENAME_MAX_LENGTH);
         final String fileContent = data.consumeRemainingAsString();
 
         // Create needed objects
@@ -35,9 +34,7 @@ public class FileBodyWriteToFuzzer {
         // Actual fuzzing begins here
         try {
             final FileBody fileBody = new FileBody(tempFile, contentType, filename);
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-            fileBody.writeTo(outputStream);
+            fileBody.writeTo(new ByteArrayOutputStream());
         } catch (IOException ignored) {
             // ignore expected exceptions
         }
