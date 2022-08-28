@@ -10,12 +10,14 @@ import org.apache.hc.client5.http.entity.mime.FileBody;
 import org.apache.hc.core5.http.ContentType;
 
 public class FileBodyWriteToFuzzer {
+    private static final int fileNameLength = 255;
+
     private static File tempFile = null;
 
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
         // Create objects from fuzzer input
         final ContentType contentType = data.pickValue(contentTypes);
-        final String filename = data.consumeString(255);
+        final String filename = data.consumeString(fileNameLength);
         final String fileContent = data.consumeRemainingAsString();
 
         // Create needed objects
