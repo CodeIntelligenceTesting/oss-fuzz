@@ -27,8 +27,6 @@ import org.apache.hc.core5.http.ContentType;
 public class FileBodyWriteToFuzzer {
     private static final int FILENAME_MAX_LENGTH = 255;
 
-    private static File tempFile = null;
-
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
         // Create objects from fuzzer input
         final ContentType contentType = data.pickValue(contentTypes);
@@ -36,14 +34,19 @@ public class FileBodyWriteToFuzzer {
         final String fileContent = data.consumeRemainingAsString();
 
         // Create needed objects
+        final File tempFile;
         try {
-            tempFile = File.createTempFile("FileBody", "bin");
+            tempFile = File.createTempFile("FileBody", ".bin");
+        } catch (IOException ioe) {
+            return;
+        }
 
+        try {
             final FileWriter fileWriter = new FileWriter(tempFile);
             fileWriter.write(fileContent);
             fileWriter.close();
         } catch (IOException ioe) {
-            // Preparations failed ; exit early
+            tempFile.delete();
             return;
         }
 
@@ -53,11 +56,7 @@ public class FileBodyWriteToFuzzer {
             fileBody.writeTo(new ByteArrayOutputStream());
         } catch (IOException ignored) {
             // ignore expected exceptions
-        }
-    }
-
-    public static void fuzzerTearDown() {
-        if (tempFile != null) {
+        } finally {
             tempFile.delete();
         }
     }

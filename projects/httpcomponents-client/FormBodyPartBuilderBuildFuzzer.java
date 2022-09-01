@@ -36,8 +36,6 @@ public class FormBodyPartBuilderBuildFuzzer {
     private static final int fieldValueLength = 500;
     private static final int bodyContentSize = 2 * fieldValueLength;
 
-    private static File tempFile = null;
-
     private enum BodyType { ByteArray, File, InputStream, String }
 
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
@@ -73,13 +71,19 @@ public class FormBodyPartBuilderBuildFuzzer {
                 break;
 
             case File:
-                final File tempFile = File.createTempFile("FileBody", "bin");
+                final File tempFile = File.createTempFile("FileBody", ".bin");
 
-                final FileWriter fileWriter = new FileWriter(tempFile);
-                fileWriter.write(data.consumeString(bodyContentSize));
-                fileWriter.close();
+                try {
+                    final FileWriter fileWriter = new FileWriter(tempFile);
+                    fileWriter.write(data.consumeString(bodyContentSize));
+                    fileWriter.close();
+                } catch (IOException ioe) {
+                    tempFile.delete();
+                    throw ioe;
+                }
 
                 contentBody = new FileBody(tempFile);
+                tempFile.delete();
                 break;
 
             case InputStream:
@@ -97,11 +101,5 @@ public class FormBodyPartBuilderBuildFuzzer {
         }
 
         return contentBody;
-    }
-
-    public static void fuzzerTearDown() {
-        if (tempFile != null) {
-            tempFile.delete();
-        }
     }
 }
