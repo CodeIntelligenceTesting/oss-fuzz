@@ -26,21 +26,22 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileHandler;
 
 public class XMLConfigurationWriteFuzzer {
-    private static File tempFile = null;
-
     public static void fuzzerTestOneInput(FuzzedDataProvider data) {
         // Create needed objects
         final File tempFile;
-        final String absoluteFilepath;
         try {
-            tempFile = File.createTempFile("XMLConfiguration", "xml");
-            absoluteFilepath = tempFile.getAbsolutePath();
+            tempFile = File.createTempFile("XMLConfiguration", ".xml");
+        } catch (IOException ioe) {
+            return;
+        }
 
+        final String absoluteFilepath = tempFile.getAbsolutePath();
+        try {
             final FileWriter fileWriter = new FileWriter(tempFile);
             fileWriter.write(data.consumeRemainingAsString());
             fileWriter.close();
         } catch (IOException ioe) {
-            // Preparations failed ; exit early
+            tempFile.delete();
             return;
         }
 
@@ -55,11 +56,7 @@ public class XMLConfigurationWriteFuzzer {
             xmlConfig.write(new StringWriter());
         } catch (ConfigurationException | IOException ignored) {
             // expected Exceptions get ignored
-        }
-    }
-
-    public static void fuzzerTearDown() {
-        if (tempFile != null) {
+        } finally {
             tempFile.delete();
         }
     }
