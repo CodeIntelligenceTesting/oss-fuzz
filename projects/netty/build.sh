@@ -15,13 +15,13 @@
 #
 ################################################################################
 
-MVN_FLAGS="-DskipTests"
+MVN_FLAGS="-DskipTests -Dmaven.repo.local=$OUT/m2 -DskipTests -Dmaven.test.skip=true"
 ALL_JARS=""
 LIBRARY_NAME="netty"
 
 # Install the build servers' jazzer-api into the maven repository.
 pushd "/tmp"
-	${MVN} install:install-file -Dfile=${JAZZER_API_PATH} \
+	${MVN} ${MVN_FLAGS} install:install-file -Dfile=${JAZZER_API_PATH} \
 		-DgroupId="com.code-intelligence" \
 		-DartifactId="jazzer-api" \
 		-Dversion="0.12.0" \
@@ -29,8 +29,8 @@ pushd "/tmp"
 popd
 
 pushd "."
-	${MVN} install ${MVN_FLAGS}
-	CURRENT_VERSION=$(${MVN} org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate \
+	#${MVN} install ${MVN_FLAGS}
+	CURRENT_VERSION=$(${MVN} ${MVN_FLAGS} org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate \
   -Dexpression=project.version -q -DforceStdout)
 popd
 
